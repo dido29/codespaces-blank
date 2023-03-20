@@ -14,7 +14,7 @@
 </head>
 <body>
  <header>
-    <h1 class="logo">Il mio sito e-commerce</h1>
+    <h1 class="logo">GAME SCAM</h1>
     <!--Inserisce la nav bar-->
     <nav>
     	<!--crea la lista non ordinata per la home,prodotti,contatti-->
@@ -151,7 +151,8 @@
     $result=$mysqli -> query($smt3);
     print "
     	<form action=prodotti.php method=post>
-    	<select name='campoSelect' ><br>";
+    	<select name='campoSelect' ><br>
+        <option value='Tutte'>Tutte</option>";
       while($row = $result->fetch_array(MYSQLI_BOTH)) {
         $codice_categoria=$row['codice_categoria'];
         $tipo=$row['tipo'];
@@ -159,6 +160,8 @@
       }
 	print"
         </select>
+        ordina dalla A a Z <input type='checkbox' value='check' name='checkBox'>
+        prezzo <input type='checkbox' value='checkP' name='checkBoxP'>
         <input type=submit name=categoria value='cerca'>
         </form>
     ";
@@ -170,8 +173,9 @@
 //prodotti
 
 if(isset($_POST['invio_p1'])){
-    $smt3="SELECT * FROM prodotto";
-    $result=$mysqli -> query($smt3);
+
+	$smt="SELECT * FROM prodotto";
+    $result=$mysqli -> query($smt);
 	print "<ul class='product-list'>";
       while($row = $result->fetch_array(MYSQLI_BOTH)) {
       $pezzi_d_m=$row['pezzi_d_m'];
@@ -204,34 +208,93 @@ if(isset($_POST['invio_p1'])){
     }
    } 
 }
-if(isset($_POST['campoSelect'])){
+
+if(isset($_GET['codice_prodotto'])){
+     	$codice_prodotto=$_GET['codice_prodotto'];
+        print $codice_prodotto;
+        $smt="SELECT * FROM prodotto WHERE codice_prodotto=".$codice_prodotto."";
+        print $smt;
+        $result=$mysqli -> query($smt);
+          print "<ul class='product-list'>";
+            while($row = $result->fetch_array(MYSQLI_BOTH)) {
+            $pezzi_d_m=$row['pezzi_d_m'];
+            $codice_prodotto=$row['codice_prodotto'];
+            $immagine=$row['immagine'];
+            print "<li>";
+            print "<img src= ".$immagine."><br>";
+            //print $row['nome']."<br>";
+            print "<span class='font'>".$row['nome']."</span><br>";
+            print "<form action=pagina_gioco.php method=get>
+                   <input type=hidden name=codice_prodotto value='".$codice_prodotto."'>
+                   <input type=submit name=n20 value='ciao'>
+                   </form>";
+            print  $row['prezzo']."<hr>";
+            print "<form action=index.php method=post>
+                    <input type=hidden name=aggiungialcarrello value=1>
+                    <input type=hidden name=codice_prodotto value='".$codice_prodotto."'>
+                    <input type=hidden name=pezzi_d_m value='".$pezzi_d_m."'>
+                    <input type=submit name='n1' value='aggiungi al carrello' onclick='toggleCart()'>
+                    </form>
+                    </li>";
+            }
+        	print "</ul>";
+        // Retrieve the value of $cont for this product from the session, or initialize it to 0 if it doesn't exist
+
+      if(isset($_POST['n1'])){
+            print "<hr>";
+            if($pezzi_d_m==0){
+          print "esaurito<hr>";
+        }
+       } 
+}
+     
+if(isset($_POST['campoSelect']) || isset($_POST['checkBox']) || isset($_POST['checkBoxP'])){
 
 	$codice_categoria=$_POST['campoSelect'];
-    print $codice_categoria;
-    $smt3="SELECT * FROM prodotto WHERE categoria=".$codice_categoria."";
+    $check=$_POST['checkBox'];
+    $checkP=$_POST['checkBoxP'];
+    $smt3="";
+    $smt3="SELECT * FROM prodotto";
+    if ($codice_categoria != "Tutte"){
+          $smt3=$smt3." WHERE categoria=".$codice_categoria."";
+    }
+    $order=false;
+    if($check == 'check'){
+       $smt3=$smt3." ORDER BY nome ASC";
+       $order=true;
+    }
+    if($checkP == 'checkP'){
+    if($order == false) $smt3=$smt3." ORDER BY ";
+    else $smt3=$smt3." , ";
+    
+       $smt3=$smt3." prezzo ASC";
+    }
+    print $smt3;
     $result=$mysqli -> query($smt3);
-	print "<ul class='product-list'>";
-      while($row = $result->fetch_array(MYSQLI_BOTH)) {
-      $pezzi_d_m=$row['pezzi_d_m'];
-      $codice_prodotto=$row['codice_prodotto'];
-      $immagine=$row['immagine'];
-      	print "<li>";
-        print "<img src= ".$immagine."><br>";
-      	//print $row['nome']."<br>";
-        print "<span class='font'>".$row['nome']."</span><br>";
-        print "<form action=pagina_gioco.php method=get>
-        	   <input type=hidden name=codice_prodotto value='".$codice_prodotto."'>
-               <input type=submit name=n20 value='ciao'>
-               </form>";
-        print  $row['prezzo']."<hr>";
-        print "<form action=index.php method=post>
-        		<input type=hidden name=aggiungialcarrello value=1>
-        		<input type=hidden name=codice_prodotto value='".$codice_prodotto."'>
-                <input type=hidden name=pezzi_d_m value='".$pezzi_d_m."'>
-        		<input type=submit name='n1' value='aggiungi al carrello' onclick='toggleCart()'>
-                </form>
-                </li>";
-    	}
+    
+    
+        print "<ul class='product-list'>";
+          while($row = $result->fetch_array(MYSQLI_BOTH)) {
+          $pezzi_d_m=$row['pezzi_d_m'];
+          $codice_prodotto=$row['codice_prodotto'];
+          $immagine=$row['immagine'];
+            print "<li>";
+            print "<img src= ".$immagine."><br>";
+            //print $row['nome']."<br>";
+            print "<span class='font'>".$row['nome']."</span><br>";
+            print "<form action=pagina_gioco.php method=get>
+                   <input type=hidden name=codice_prodotto value='".$codice_prodotto."'>
+                   <input type=submit name=n20 value='ciao'>
+                   </form>";
+            print  $row['prezzo']."<hr>";
+            print "<form action=index.php method=post>
+                    <input type=hidden name=aggiungialcarrello value=1>
+                    <input type=hidden name=codice_prodotto value='".$codice_prodotto."'>
+                    <input type=hidden name=pezzi_d_m value='".$pezzi_d_m."'>
+                    <input type=submit name='n1' value='aggiungi al carrello' onclick='toggleCart()'>
+                    </form>
+                    </li>";
+    	}    
 }
  	print "
       <script>
@@ -371,7 +434,7 @@ if(isset($_POST['campoSelect'])){
 ?>
 </main>
 <footer>
-    <p>&copy; 2023 Il mio sito e-commerce. Tutti i diritti riservati.</p>
+    <p>&copy; 2023 GAME SCAM. Tutti i diritti riservati.</p>
   </footer>
 </body>
 </html>

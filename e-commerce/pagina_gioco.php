@@ -6,8 +6,34 @@
           	<link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css'>
             <link rel="stylesheet" href="stile_carrello.css">
                 <style>
-    * {
+* {
   box-sizing: border-box;
+}
+/* Full Star Icon */
+.star {
+  background-image: url('https://img.icons8.com/color/48/null/filled-star--v1.png');
+  background-repeat: no-repeat;
+  display: inline-block;
+  height: 48px;
+  width: 48px;
+}
+
+/* Half Star Icon */
+.half-voted {
+  background-image: url('https://img.icons8.com/external-tal-revivo-shadow-tal-revivo/48/null/external-half-star-ratings-for-below-the-average-performance-votes-shadow-tal-revivo.png');
+  background-repeat: no-repeat;
+  display: inline-block;
+  height: 48px;
+  width: 48px;
+}
+
+/* Empty Star Icon */
+.star:not(.voted):not(.half-voted) {
+  background-image: url('https://img.icons8.com/external-those-icons-lineal-color-those-icons/48/null/external-Star-vote-and-reward-those-icons-lineal-color-those-icons-5.png');
+  background-repeat: no-repeat;
+  display: inline-block;
+  height: 48px;
+  width: 48px;
 }
 
 body {
@@ -21,7 +47,6 @@ body {
   flex-wrap: wrap;
   justify-content: center;
   align-items: center;
-  height: 100vh;
 }
 
 .product-image {
@@ -57,7 +82,9 @@ body {
 .product-info .description {
   margin-top:50px;
 }
-
+.product-info .description_r {
+  margin-top:8px;
+}
 .product-info form {
   padding:30px;
   margin-top: 250px;
@@ -89,11 +116,13 @@ body {
 </head>
 <body>
 <?php
-	if(isset($_GET['n20'])) {
-        if(isset($_GET['n20'])) $codice_prodotto=$_GET['codice_prodotto'];
+	if( isset($_GET['codice_prodotto']) || isset($_GET['n20'])) $codice_prodotto=$_GET['codice_prodotto']; {
+        if(isset($_GET['n20']))  $codice_prodotto=$_GET['codice_prodotto'];
+        print $codice_prodotto;
+        //https://img.icons8.com/external-tal-revivo-shadow-tal-revivo/48/null/external-half-star-ratings-for-below-the-average-performance-votes-shadow-tal-revivo.png
 ?>
  <header>
-    <h1 class="logo">Il mio sito e-commerce</h1>
+    <h1 class="logo">GAME SCAM</h1>
     <nav>
       <ul>
         <li><a href="index.php">Home</a></li>
@@ -209,9 +238,6 @@ body {
       </ul>
    </nav>
   </header>
-  <div class="subheader">
-    <h2>Benvenuto nel nostro negozio online!</h2>
-  </div>
 <main>
 <div class="container">
 <?php	
@@ -222,6 +248,8 @@ body {
       $pezzi_d_m=$row['pezzi_d_m'];
       $codice_prodotto=$row['codice_prodotto'];
       $immagine=$row['immagine'];
+      $prezzo=$row['prezzo'];
+      $descrizione_b=$row['descrizione_b'];
       			
       print'
               <div class="product-image">
@@ -231,21 +259,96 @@ body {
       print'                                    
               <div class="product-info">
               	<div style="margin-left:201px">
-                  <h1>'.$row['nome'].'</h1>
-                  <p class="price">Prezzo: €'.$row['prezzo'].'</p>
-                  <p class="description">Descrizione prodotto breve: '.$row['descrizione_b'].'</p>
-                  <form action=index.php method=post>
-                  <input type=hidden name=aggiungialcarrello value=1>
-                  <input type=hidden name=codice_prodotto value='.$codice_prodotto.'>
-                  <input type=hidden name=pezzi_d_m value='.$pezzi_d_m.'>
-                  <input type=submit name="n1" value="aggiungi al carrello" onclick="toggleCart()">
-                  </form>
-                </div>
-              </div>
-            ';  
+                  <h1>'.$row['nome'].'</h1>          
+      ';
+      
+      $query = "SELECT * FROM recensioni WHERE codice_prodotto = ".$codice_prodotto."";
+  	  $result2 = $mysqli -> query($query);
+	  if ($result2->num_rows > 0) {
+      	while($row = $result2->fetch_array(MYSQLI_BOTH)) {
+        	$voto=$row['voto'];
+            $cont+=1;
+            $voto_tot+=$voto;
+        }
+        $voto_medio=$voto_tot/$cont;
+      }
+      
+        print '<div class="stars" id="vote-123" data-idprod="'.$codice_prodotto.'" data-idcliente="'.$_COOKIE['codice_cliente'].'">';
+        for($i=1; $i<=5; $i++) {
+          $star_class = "star";
+          if($i <= floor($voto_medio)) {
+            $star_class .= " voted";
+          } else if(($i - $voto_medio) <= 0.5) {
+            $star_class .= " half-voted";
+          }
+          print '<span class="'.$star_class.'" data-value="'.$i.'"></span>';
+        }
+        print $voto_medio. '%';
+        print '</div>';  
+        
+    print'
+    					<p class="description_r">recensito da '.$cont.' persone</p>
+                        <p class="price">Prezzo: €'.$prezzo.'</p>
+                        <p class="description">Descrizione prodotto breve: '.$descrizione_b.'</p>
+                        <form action=index.php method=post>
+                        <input type=hidden name=aggiungialcarrello value=1>
+                        <input type=hidden name=codice_prodotto value='.$codice_prodotto.'>
+                        <input type=hidden name=pezzi_d_m value='.$pezzi_d_m.'>
+                        <input type=submit name="n1" value="aggiungi al carrello" onclick="toggleCart()">
+                        </form>
+                      </div>
+                    </div>
+	';  
     }          
     // Retrieve the value of $cont for this product from the session, or initialize it to 0 if it doesn't exist
-    
+    print "
+    <script>
+    const stars = document.querySelectorAll('.star');
+
+      stars.forEach(star => {
+        star.addEventListener('click', () => {
+          const voteId = star.parentElement.id;
+          const idprod = star.parentElement.getAttribute('data-idprod');
+          const idcliente = star.parentElement.getAttribute('data-idcliente');
+          const voteValue = star.getAttribute('data-value');
+
+          // mostra l'alert di conferma
+          const confirmation = confirm('Sei sicuro di voler dare ' + voteValue + ' stelle?');
+
+          if (confirmation) {
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', 'submit_vote.php');
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            xhr.onload = function() {
+              if (xhr.status === 200 && xhr.responseText !== 'error') {
+                const response = JSON.parse(xhr.responseText);
+                console.log(xhr.responseText);
+                if (response[0] === false) {
+                  // user has already voted for this product
+                  stars.forEach(star => star.classList.add('disabled'));
+                  alert('Hai già votato per questo prodotto. Grazie per il tuo feedback!');
+                } else {
+                  // user has not voted for this product yet
+                  alert('Voto registrato con successo!');
+                  stars.forEach(s => {
+                    s.style.pointerEvents = 'none'; // disabilita la possibilità di votare di nuovo
+                  });
+                    }
+              } else {
+                // handle error response
+                alert('Si è verificato un errore durante la registrazione del voto.');
+              }
+            };
+            xhr.send('vote_id=' + voteId + '&vote_value=' + voteValue + '&id_prod=' + idprod + '&id_cliente=' + idcliente);
+          }
+        });
+      });
+
+		
+    </script>
+  ";
+
+  
   if(isset($_POST['n20'])){
         print "<hr>";
    		if($pezzi_d_m==0){
@@ -256,7 +359,7 @@ body {
 </div>
 </main>
 <footer>
-    <p>&copy; 2023 Il mio sito e-commerce. Tutti i diritti riservati.</p>
+    <p>&copy; 2023 GAME SCAM. Tutti i diritti riservati.</p>
   </footer>
 <?php
 }

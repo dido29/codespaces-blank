@@ -210,10 +210,8 @@ if(isset($_POST['invio_p1'])){
 }
 
 if(isset($_GET['codice_prodotto'])){
-     	$codice_prodotto=$_GET['codice_prodotto'];
-        print $codice_prodotto;
-        $smt="SELECT * FROM prodotto WHERE codice_prodotto=".$codice_prodotto."";
-        print $smt;
+     	$nome_prodotto=$_GET['codice_prodotto'];
+        $smt="SELECT * FROM prodotto WHERE nome LIKE '%".$nome_prodotto."%' ";
         $result=$mysqli -> query($smt);
           print "<ul class='product-list'>";
             while($row = $result->fetch_array(MYSQLI_BOTH)) {

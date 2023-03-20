@@ -6,6 +6,12 @@
   			<link rel="stylesheet" href="style.css">
           	<link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css'>
 			<link rel="stylesheet" href="stile_carrello.css">
+           	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+            <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
+            <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
+            <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.css">
+            <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
             <style>
             .font{
             font-family: 'Noto Sans JP', sans-serif;
@@ -14,11 +20,91 @@
 </head>
 <body>
  <header>
-    <h1 class="logo">Il mio sito e-commerce</h1>
+    <h1 class="logo">GAME SCAM</h1>
     
     <!--Inserisce la nav bar-->
-    <nav>
-    	<!--crea la lista non ordinata per la home,prodotti,contatti-->
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expandend="false" aria-label="Toggle navigation">
+            <span class="navbat-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <br><br>
+                <div class="container mt-5">
+                    <div class="form-row">
+                        <div class="form-grop col-md-6 offset-md-3">
+                            <label><b>Cosa stai cercando? </b></label>
+                              <form id="search-form" action="prodotti.php" method="get" style="display:flex;">
+                                  <input type="text" name="username" id="mainresponsible" placeholder="Cerca il tuo gioco..." class="form-control actions" required>
+                                  <input type="hidden" name="codice_prodotto" id="codice_prodotto" value="">
+                                  <input type="submit" name="n20" value="cerca" style="margin-left:3px;">
+                              </form>
+                              <script>
+                              $(function() {
+                                $(function() {
+                                $('#mainresponsible').autocomplete({
+                                  source: function(request, response) {
+                                    $.getJSON('fetch_autosearch.php', { term: request.term }, function(products) {
+                                      response($.map(products, function(product) {
+                                        return {
+                                          label: product.name,
+                                          value: product.name,
+                                          codice_prodotto: product.id
+                                        }
+                                      }));
+                                    });
+                                  },
+                                  select: function(event, ui) {
+                                    window.location.href = 'pagina_gioco.php?codice_prodotto=' + ui.item.codice_prodotto;
+                                  }
+                                }).data('ui-autocomplete')._renderItem = function(ul, item) {
+                                  return $('<li>').append('<div>' + item.label + '</div>').appendTo(ul);
+                                };
+                              });
+
+                              });
+                              
+                             $(function() {
+  $("#codice_prodotto").on("change", function() {
+    // Aggiorna il valore dell'input hidden quando l'utente seleziona un'opzione dall'autocomplete
+    $("#codice_prodotto").val(this.value);
+  });
+
+  $("#search-form").on("submit", function() {
+    // Aggiorna il valore dell'input hidden quando l'utente invia il form
+    $("#codice_prodotto").val(getSearchValue());
+  });
+
+  function getSearchValue() {
+    var searchValue = $("#mainresponsible").val();
+    return searchValue;
+  }
+
+  // Inizializza il plugin jQuery Autocomplete
+  $("#codice_prodotto").autocomplete({
+    source: 'fetch_autosearch1.php',
+    select: function(event, ui) {
+      // Aggiorna il valore dell'input text quando l'utente seleziona un'opzione dall'autocomplete
+      $("#mainresponsible").val(ui.item.label);
+      // Aggiorna il valore dell'input hidden
+      $("#codice_prodotto").val(ui.item.value);
+      return false;
+    }
+  });
+});
+
+
+                              </script>
+                        </div>
+                    </div>
+                </div>
+            <script type="text/javascript">
+                $(function(){
+                $( "#codice_prodotto").autocomplete({
+                    source: 'fetch_autosearch1.php',
+                });   
+                });
+            </script>
+        </div>	
       <ul>
         <li><a href="index.php">Home</a></li>
         <li>
@@ -377,7 +463,7 @@
 ?>
 </main>
 <footer>
-    <p>&copy; 2023 Il mio sito e-commerce. Tutti i diritti riservati.</p>
+    <p>&copy; 2023 GAME SCAM. Tutti i diritti riservati.</p>
   </footer>
 </body>
 </html>

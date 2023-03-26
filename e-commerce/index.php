@@ -1,6 +1,6 @@
 <html>
 <head>
-
+<meta charset="UTF-8">
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
   			<link rel="stylesheet" href="style.css">
@@ -11,32 +11,37 @@
             <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
             <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
             <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.css">
-            <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+
             <style>
             .font{
             font-family: 'Noto Sans JP', sans-serif;
-            }
+            } 
+
             </style>
 </head>
 <body>
  <header>
-    <h1 class="logo">GAME SCAM</h1>
     
     <!--Inserisce la nav bar-->
     <nav class="navbar navbar-expand-lg navbar-light">
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expandend="false" aria-label="Toggle navigation">
-            <span class="navbat-toggler-icon"></span>
-        </button>
+    <ul style="margin-bottom: 0px;align-items: baseline;">
+      <li>
+        <h1 class="logo">GAME SCAM</h1>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expandend="false" aria-label="Toggle navigation">
+                <span class="navbat-toggler-icon"></span>
+            </button>
+      </li>
+      <li style="width:900px">
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <br><br>
-                <div class="container mt-5">
+                <div class="container">
                     <div class="form-row">
                         <div class="form-grop col-md-6 offset-md-3">
                             <label><b>Cosa stai cercando? </b></label>
                               <form id="search-form" action="prodotti.php" method="get" style="display:flex;">
                                   <input type="text" name="username" id="mainresponsible" placeholder="Cerca il tuo gioco..." class="form-control actions" required>
                                   <input type="hidden" name="codice_prodotto" id="codice_prodotto" value="">
-                                  <input type="submit" name="n20" value="cerca" style="margin-left:3px;">
+                                  <button type="submit"  name="n20" ><i class='fa fa-search'></i></button>
                               </form>
                               <script>
                               $(function() {
@@ -47,6 +52,7 @@
                                       response($.map(products, function(product) {
                                         return {
                                           label: product.name,
+                                          label2: product.tipo,
                                           value: product.name,
                                           codice_prodotto: product.id
                                         }
@@ -57,40 +63,40 @@
                                     window.location.href = 'pagina_gioco.php?codice_prodotto=' + ui.item.codice_prodotto;
                                   }
                                 }).data('ui-autocomplete')._renderItem = function(ul, item) {
-                                  return $('<li>').append('<div>' + item.label + '</div>').appendTo(ul);
+                                  return $('<li>').append('<div style="border: 2px solid #dddddd; ">' + item.label + " - " + item.label2 +'</div>').appendTo(ul);
                                 };
                               });
 
                               });
                               
                              $(function() {
-  $("#codice_prodotto").on("change", function() {
-    // Aggiorna il valore dell'input hidden quando l'utente seleziona un'opzione dall'autocomplete
-    $("#codice_prodotto").val(this.value);
-  });
+                               $("#codice_prodotto").on("change", function() {
+                                 // Aggiorna il valore dell'input hidden quando l'utente seleziona un'opzione dall'autocomplete
+                                 $("#codice_prodotto").val(this.value);
+                               });
 
-  $("#search-form").on("submit", function() {
-    // Aggiorna il valore dell'input hidden quando l'utente invia il form
-    $("#codice_prodotto").val(getSearchValue());
-  });
+                               $("#search-form").on("submit", function() {
+                                 // Aggiorna il valore dell'input hidden quando l'utente invia il form
+                                 $("#codice_prodotto").val(getSearchValue());
+                               });
 
-  function getSearchValue() {
-    var searchValue = $("#mainresponsible").val();
-    return searchValue;
-  }
+                               function getSearchValue() {
+                                 var searchValue = $("#mainresponsible").val();
+                                 return searchValue;
+                               }
 
-  // Inizializza il plugin jQuery Autocomplete
-  $("#codice_prodotto").autocomplete({
-    source: 'fetch_autosearch1.php',
-    select: function(event, ui) {
-      // Aggiorna il valore dell'input text quando l'utente seleziona un'opzione dall'autocomplete
-      $("#mainresponsible").val(ui.item.label);
-      // Aggiorna il valore dell'input hidden
-      $("#codice_prodotto").val(ui.item.value);
-      return false;
-    }
-  });
-});
+                               // Inizializza il plugin jQuery Autocomplete
+                               $("#codice_prodotto").autocomplete({
+                                 source: 'fetch_autosearch1.php',
+                                 select: function(event, ui) {
+                                   // Aggiorna il valore dell'input text quando l'utente seleziona un'opzione dall'autocomplete
+                                   $("#mainresponsible").val(ui.item.label);
+                                   // Aggiorna il valore dell'input hidden
+                                   $("#codice_prodotto").val(ui.item.value);
+                                   return false;
+                                 }
+                               });
+                             });
 
 
                               </script>
@@ -105,20 +111,43 @@
                 });
             </script>
         </div>	
-      <ul>
-        <li><a href="index.php">Home</a></li>
-        <li>
-        <form action=prodotti.php method=post>
-        <input type=submit name=invio_p1 value='Prodotti'>
+      </li>
+      <li>
+      	<div class="dropdown">
+          <button class="dropbtn">
+            <i class="fa fa-user-circle" style="font-size: 30px;"></i>
+          </button>
+          <div style="width: 200px;text-align:center;" class="dropdown-content">   
+          <?php
+          if(isset($_COOKIE['username'])){
+            echo 
+               "UTENTE ".
+               $_COOKIE['username']."
+              <a href='logout.php'><i class='fa fa-sign-out'></i>Logout</a>
+              ";
+            }else{
+            echo"
+              <a href=login.php>Login</a>
+              Non sei registrato?
+              <a href=inserisci.php?cod=".$row['codice'].">+ Crea<br>Account</a>";
+            }
+          ?>
+          </div>
+        </div>
+      </li>  
+      <li><a href="index.php">Home</a></li>
+      <li>
+        <form action=prodotti.php method=get>
+          <input type=submit name=invio_p1 value='Prodotti' style="background: none;border: none;">
         </form>
-        </li>
-        <li><a href="#">Contatti</a></li>
-        <li>
+      </li>
+      <li><a href="#">Contatti</a></li>
+      <li>
         <!--crea l'oggetto della carta-->
-        	<div class="cart-dropdown">
-            <a href="#" class="cart-icon" onclick="toggleCart()">
-              <i class="fa fa-opencart"></i>
-            </a>
+        <div class="cart-dropdown">
+          <a href="#" class="cart-icon" onclick="toggleCart()">
+            <i class="fa fa-opencart"></i>
+          </a>
             <?php
             // inserisco i dati del server
              $servername = "localhost";
@@ -132,56 +161,59 @@
                echo "Failed to connect to MySQL: ". $mysqli ->connect_errno;
                exit();
              }
-			
             // incomincio la sessione
             session_start();
-            	
+            
                 //controllo se è stato premuto aggiungi ala carello
             	if(isset($_POST['aggiungialcarrello'])){
+                	if(isset($_COOKIE['username']) || isset($_COOKIE['password'])){
                       //aggiungo al carrello il codice del prodotto e i pezzi disponibili in magazzino
                       $codice_prodotto=$_POST["codice_prodotto"];
-					  $pezzi_d_m=$_POST["pezzi_d_m"];
-                      
-                      // verifico presenza nel carrello del cliente il prodotto che sto inserendo e eventualmente ne prelevo il numero e il risultato lo rimando alla query
+                      $pezzi_d_m=$_POST["pezzi_d_m"];
+                        // verifico presenza nel carrello del cliente il prodotto che sto inserendo e eventualmente ne prelevo il numero e il risultato lo rimando alla query
                       $query = "SELECT * FROM carrello WHERE codice_cliente='".$_COOKIE['codice_cliente']."' AND codice_prodotto='".$codice_prodotto."' "; 
-                    $result = $mysqli -> query($query);
-                    
-                    // come numero dei pezzi acquistati parte da zero 
-                    $n_pezzi_acq=0;
-                    
-                    // se il numero delle righe è maggiore di zero
-                    if ($result->num_rows > 0) {
-                    
-                        // Il gioco è già nel carrello: aggiorna la quantità
-                        $row = $result->fetch_assoc();
-                        
-                        // Associa il numero dei pezzi acquistati nella variabile dei numeri pezzi 
-                        $n_pezzi_acq = $row['n_pezzi_acq'];
-                    }
-                    
-                    // Se invece il numero è maggiore di zero il numero dei pezzi viene incrementato di 1
-                    $n_pezzi_acq+=1;
-			
-            // se il numero dei pezzi in magazzino è maggiore o uguale al numero dei pezzi acquistati
-			if ($pezzi_d_m >= $n_pezzi_acq) {
-            
-            	  // se il numero dei pezzi acquistati è uguale a 1
-                  if($n_pezzi_acq==1){
-                  $query = "INSERT INTO `carrello` (codice_prodotto, codice_cliente, n_pezzi_acq) 
-                  VALUES ($codice_prodotto, '{$_COOKIE['codice_cliente']}',$n_pezzi_acq)";
-                      $mysqli -> query($query);
-                 }else{
-                      $smt = "UPDATE `carrello` SET n_pezzi_acq = '$n_pezzi_acq' WHERE codice_prodotto = '$codice_prodotto' 
-                      AND codice_cliente = '{$_COOKIE['codice_cliente']}'";
-                      $mysqli ->query($smt);
+                      $result = $mysqli -> query($query);
+                      // come numero dei pezzi acquistati parte da zero 
+                      $n_pezzi_acq=0;
+                      // se il numero delle righe è maggiore di zero
+                      if ($result->num_rows > 0) {
+                          // Il gioco è già nel carrello: aggiorna la quantità
+                          $row = $result->fetch_assoc();
+                          // Associa il numero dei pezzi acquistati nella variabile dei numeri pezzi 
+                          $n_pezzi_acq = $row['n_pezzi_acq'];
                       }
-                 }
-   			}
+                      // Se invece il numero è maggiore di zero il numero dei pezzi viene incrementato di 1
+                      $n_pezzi_acq+=1;
+              // se il numero dei pezzi in magazzino è maggiore o uguale al numero dei pezzi acquistati
+                      if ($pezzi_d_m >= $n_pezzi_acq) {
+                        // se il numero dei pezzi acquistati è uguale a 1
+                        if($n_pezzi_acq==1){
+                        $query = "INSERT INTO `carrello` (codice_prodotto, codice_cliente, n_pezzi_acq) 
+                        VALUES ($codice_prodotto, '{$_COOKIE['codice_cliente']}',$n_pezzi_acq)";
+                            $mysqli -> query($query);
+                       }else{
+                            $smt = "UPDATE `carrello` SET n_pezzi_acq = '$n_pezzi_acq' WHERE codice_prodotto = '$codice_prodotto' 
+                            AND codice_cliente = '{$_COOKIE['codice_cliente']}'";
+                            $mysqli ->query($smt);
+                            }
+                       }
+                    }else{
+                      echo '<script type="text/javascript">
+                      function redirezionamento() {
+                      location.href = "login.php";
+                      alert("devi avere un account");
+                      }
+                      window.setTimeout("redirezionamento()", 400);
+                      </script>';
+                    }
+                }
+              
 			echo "<div class='cart-content' id='cart' style='display: none;' >
               		<ul class='cart-items'> ";
                     
              $query="SELECT * FROM carrello INNER JOIN prodotto ON prodotto.codice_prodotto=carrello.codice_prodotto WHERE codice_cliente='".$_COOKIE['codice_cliente']."'"; 
-              if ($result = $mysqli -> query($query)) { 
+              $result = $mysqli -> query($query);
+          	  if ($result->num_rows > 0) {
                   while($row = $result->fetch_array(MYSQLI_BOTH)) {
                     $nome_gioco = $row['nome']; 
                     $n_pezzi_acq = $row['n_pezzi_acq']; 
@@ -192,12 +224,12 @@
                     
                     echo "
                     <div class='product'>
-                    <li class='cart-item' id='prod_id".$codice_prodotto."'>
+                    <li class='cart-item' id='prod_id".$codice_prodotto."''>
                     <img src='".$immagine."' alt='Item 1' widht=50%>
                       	<div class='cart-item-details'>
                           <h4 class='cart-item-title'>".$nome_gioco."</h4>
                           <p class='cart-item-price'>id prodotto: ".$codice_prodotto."</p>
-                          <p class='cart-item-price' id='price".$codice_prodotto."'>prezzo $".$prezzo_tot."</p>";
+                          <p class='cart-item-price' id='price".$codice_prodotto."'>prezzo ".$prezzo_tot."€</p>";
                         
                         echo "<button class='add-to-cart' data-item-id='".$codice_prodotto."' data-action='add'> +";
                         print "</button>";
@@ -219,6 +251,8 @@
                         print "
                         </ul></div>";
                      
+              }else{
+              print "Non sono presenti giochi nel carrello";
               }
 
             print '<script>
@@ -243,6 +277,7 @@
 <main>
 <?php	
 //prodotti
+    
     $smt3="SELECT * FROM prodotto";
     $result=$mysqli -> query($smt3);
 	print "<ul class='product-list'>";
@@ -250,32 +285,42 @@
       $pezzi_d_m=$row['pezzi_d_m'];
       $codice_prodotto=$row['codice_prodotto'];
       $immagine=$row['immagine'];
-      	print "<li>";
+      $categoria=$row['categoria'];
+      $prezzo=$row['prezzo'];
+      $nome_gioco=$row['nome'];
+      $smt="SELECT tipo FROM categoria WHERE codice_categoria=".$categoria."";
+      $result2=$mysqli -> query($smt);
+      while($row = $result2->fetch_array(MYSQLI_BOTH)) {
+      	$tipo=$row['tipo'];
+      }
+      	print "<li style='border: 2px solid #e9dddd;'>
+        <form action=pagina_gioco.php method=get>
+        <input type=hidden name=codice_prodotto value='".$codice_prodotto."'>
+        <button type='submit' name='n20' value='ciao'>
+        ";
         print "<img src= ".$immagine."><br>";
-      	//print $row['nome']."<br>";
-        print "<span class='font'>".$row['nome']."</span><br>";
-        print "<form action=pagina_gioco.php method=get>
-        	   <input type=hidden name=codice_prodotto value='".$codice_prodotto."'>
-               <input type=submit name=n20 value='ciao'>
-               </form>";
-        print  $row['prezzo']."<hr>";
-        print "<form action=index.php method=post>
-        		<input type=hidden name=aggiungialcarrello value=1>
-        		<input type=hidden name=codice_prodotto value='".$codice_prodotto."'>
-                <input type=hidden name=pezzi_d_m value='".$pezzi_d_m."'>
-        		<input type=submit name='n1' value='aggiungi al carrello' onclick='toggleCart()'>
+        print "<span class='font'>".$nome_gioco."</span>
+        </button>
+        </form>
+        <span class='font'>Piataforma - ".$tipo."</span><br>
+        ";
+        print  $prezzo."€<br>";
+        if($pezzi_d_m==0){
+        print "<br><p style='color: #FF0000;'>&#x1F534 Esaurito</p>";
+    	}else{
+        
+        print "<br><p style='color: #00A84F;'> &#x1F7E2 Disponibile</p><br>
+        		<form action=index.php method=post>
+                  <input type=hidden name=aggiungialcarrello value=1>
+                  <input type=hidden name=codice_prodotto value='".$codice_prodotto."'>
+                  <input type=hidden name=pezzi_d_m value='".$pezzi_d_m."'>
+                  <input type=submit name='n1' value='aggiungi al carrello' onclick='toggleCart()'>
                 </form>
-                </li>";
+          	</li>";
     	}
+      }
 	print "</ul>";
     // Retrieve the value of $cont for this product from the session, or initialize it to 0 if it doesn't exist
-    
-  if(isset($_POST['n1'])){
-        print "<hr>";
-   		if($pezzi_d_m==0){
-      print "esaurito<hr>";
-    }
-   } 
      
  	print "
       <script>
@@ -461,6 +506,7 @@
     ";
   
 ?>
+
 </main>
 <footer>
     <p>&copy; 2023 GAME SCAM. Tutti i diritti riservati.</p>
